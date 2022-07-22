@@ -2,6 +2,7 @@
 import { Command } from 'commander';
 import util from 'node:util';
 import { execSync } from 'node:child_process';
+import { warn } from 'node:console';
 
 // entry point to cli
 async function run() {
@@ -32,6 +33,22 @@ async function run() {
       'See more here: https://jestjs.io/docs/getting-started#running-from-command-line',
     );
     return;
+  }
+
+  // grab changed files from git status
+  try {
+    const stdout = await execSync('git status --porcelain');
+    const output = stdout.toString();
+    const changedFiles = output.split('\n').filter((str) => str != '');
+    const tokenized = changedFiles.map((str) =>
+      str.split(' ').filter((str) => str != ''),
+    );
+    const modified = tokenized
+      .filter((arr) => arr[0] === 'M')
+      .map((arr) => arr[1]);
+    console.log(modified);
+  } catch (e) {
+    console.log(e);
   }
 }
 

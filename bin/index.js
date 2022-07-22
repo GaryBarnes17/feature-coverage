@@ -35,6 +35,20 @@ function run() {
             console.log('See more here: https://jestjs.io/docs/getting-started#running-from-command-line');
             return;
         }
+        // grab changed files from git status
+        try {
+            const stdout = yield (0, node_child_process_1.execSync)('git status --porcelain');
+            const output = stdout.toString();
+            const changedFiles = output.split('\n').filter((str) => str != '');
+            const tokenized = changedFiles.map((str) => str.split(' ').filter((str) => str != ''));
+            const modified = tokenized
+                .filter((arr) => arr[0] === 'M')
+                .map((arr) => arr[1]);
+            console.log(modified);
+        }
+        catch (e) {
+            console.log(e);
+        }
     });
 }
 run();
